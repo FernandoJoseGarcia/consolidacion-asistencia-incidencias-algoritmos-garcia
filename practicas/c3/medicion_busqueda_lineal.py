@@ -1,6 +1,6 @@
 import time
 
-N_BASE = 200_000
+N_BASE = 50_000
 CORRIDAS = 5
 
 
@@ -30,12 +30,13 @@ def medir(n):
 tamanos = [N_BASE, 4 * N_BASE, 16 * N_BASE]
 promedios = [medir(n) for n in tamanos]
 
+
 lineas = []
-lineas.append("| n | tiempo promedio (ms) | ratio vs anterior |")
-lineas.append("|---|---|---|")
+lineas.append(f"| {'n':>10} | {'tiempo promedio (ms)':>20} | {'ratio vs anterior':>17} |")
+lineas.append(f"|{'-' * 12}|{'-' * 22}|{'-' * 19}|")
 for i, (n, t) in enumerate(zip(tamanos, promedios)):
     ratio = "-" if i == 0 else f"x{t / promedios[i - 1]:.2f}"
-    lineas.append(f"| {n:,} | {t:.2f} | {ratio} |")
+    lineas.append(f"| {n:>10,} | {t:>20.2f} | {ratio:>17} |")
 
 tabla = "\n".join(lineas)
 print(tabla)
