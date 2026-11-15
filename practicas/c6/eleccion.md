@@ -13,15 +13,20 @@ Cada día se consolida el reporte del reloj checador del día anterior con las l
 | Registros por día                      |   ~1.200 |
 | Registros por semana                   |   ~6.000 |
 | Registros por mes                      |  ~26.400 |
+| Historial de un año (26.400 × 12)      | ~316.800 |
 | Peor mes (simulado: 300 × 4 × 31 días) |   37.200 |
 
-Son 4 tablas (asistencia, empleado, vacaciones y permisos) relacionadas por el código del empleado. **El reporte de asistencia sale sin ordenar** del reloj checador.
+Son 4 tablas (asistencia, empleado, vacaciones y permisos) relacionadas por el código del empleado. **El reporte de asistencia sale sin ordenar** del reloj checador (en el H1 no lo detallé; la muestra de 20 filas viene ordenada, pero el reporte real no).
+
+El proceso se repite todos los días del año y los datos se guardan: lo del día 1 queda guardado y el día 2 se suma a lo anterior, así que el archivo va creciendo (~1.200 registros el primer día, ~2.400 el segundo, y así) hasta llegar a ~316.800 al cabo de un año. Por eso hay historial anual.
 
 ## 2. La operación que más pesa
 
 **Buscar** el código de cada marcación en las otras tablas (BUSCARV de coincidencia exacta y CONTAR.SI.CONJUNTO): cada búsqueda recorre la lista (O(n)) y se repite por cada marcación, por eso el proceso actual es O(n²).
 
 Para evitarlo, lo que voy a ordenar es el **reporte de asistencia, por código, fecha y hora**. Así las marcaciones de cada empleado quedan juntas y en orden cronológico, que es lo que hace falta para detectar retardos y omisiones, y se puede cruzar con las otras tablas sin buscar una por una.
+
+Como vimos en `c4`, ordenar para buscar con binaria conviene; acá elijo con qué algoritmo ordenar el reporte, que es el que llega desordenado. Las otras tablas se cruzan por código de empleado.
 
 ## 3. Tres candidatos
 
@@ -41,7 +46,7 @@ Descartados: QuickSort (su peor caso es O(n²) si el pivote es malo) y counting 
 - B y C garantizan O(n log n) sin importar el orden, y eso protege al proceso en el peor mes.
 - Entre B y C, C es el más rápido en mis mediciones y ya viene en el lenguaje, sin código propio que mantener. B es la misma idea escrita a mano.
 
-Evidencia 1, mi torneo de la clase 5: con 80.000 datos al azar, la inserción tardó 581.625 ms y MergeSort 621 ms, unas 936 veces más. Al duplicar n la inserción se multiplicó por ~x4 y MergeSort por poco más de x2.
+Evidencia 1, mi torneo de la clase 5 (datos al azar, de 10.000 a 80.000): con 80.000 datos la inserción tardó 581.625 ms y MergeSort 621 ms, o sea, la inserción fue unas 936 veces más lenta. Al duplicar n, la inserción se multiplicó entre x2.7 y x4.3 (cerca del x4 esperado de O(n²)) y MergeSort entre x1.0 y x1.9, con ruido de medición.
 
 Evidencia 2, medida con los tamaños de mi caso (reporte simulado sin ordenar, tiempo promedio en ms):
 
@@ -57,6 +62,7 @@ Evidencia 2, medida con los tamaños de mi caso (reporte simulado sin ordenar, t
 
 - Con el volumen de un día (1.200 registros) la inserción tarda unos 0,4 s, así que no es un problema grave. Lo grave aparece cuando el volumen crece: una semana 3 s, un mes 68 s y el peor mes unos 102 s (casi 2 minutos), mientras MergeSort ordena el peor mes en 287 ms y el sort de Python en 8 ms.
 - El cociente inserción / MergeSort crece con n (de x5.4 a x357.2), como se espera de O(n²) contra O(n log n). Hay algo de ruido entre filas (por ejemplo x75.1 en un día y x44.2 en una semana).
+- Proyección (no medida): como el archivo crece todos los días, si se ordenara el archivo acumulado de un año (~316.800 registros), la inserción tardaría unas 2,7 horas por ordenamiento (68 s con 26.400 datos, y como es O(n²), 12 veces más datos son unas 144 veces más tiempo), mientras que MergeSort y el sort de Python seguirían en pocos segundos o menos.
 - El sort de Python fue entre 15 y 52 veces más rápido que mi MergeSort. Parte de esa diferencia es que está escrito en C y el mío se ejecuta en Python.
 
 ## 5. Cómo lo medí
