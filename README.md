@@ -14,6 +14,7 @@ Caso: consolidación diaria de asistencia, permisos y vacaciones.
 **H3, la estrategia:**
 - [Estrategia: voraz o dinámica](h3/estrategia.md)
 - [Comparación medida](h3/comparacion.md) y su código [comparacion.py](h3/comparacion.py)
+- [Mi caso como grafo](h3/grafo.md)
 
 ## Prácticas
 
